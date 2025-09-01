@@ -1,4 +1,4 @@
-python-telegram-bot==13.7
-requests
-python-dotenv
-gunicorn  # For webhooks
+telethon==1.36.0
+aiohttp==3.9.5
+gunicorn==22.0.0
+flask==2.3.3
