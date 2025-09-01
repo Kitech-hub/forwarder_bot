@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+forwarded_messages.db
+session_name.session
