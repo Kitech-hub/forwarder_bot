@@ -1,13 +1,18 @@
 from telethon import TelegramClient, events
+from aiohttp import web
 import logging
 import sqlite3
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Telegram API credentials (use environment variables)
+# Telegram API credentials
 api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 phone = os.getenv("PHONE")
@@ -46,6 +51,13 @@ async def handler(event):
         log_message(event.chat_id, event.message.text, found_keywords, event.message.date)
         logger.info(f"Forwarded message with keywords: {found_keywords}")
 
+# Web server for health check
+async def webhook(request):
+    return web.Response(text="Bot is alive")
+
+app = web.Application()
+app.router.add_get('/', webhook)
+
 async def main():
     await client.start(phone=phone)
     logger.info("Client started")
@@ -53,4 +65,6 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    loop.create_task(main())
+    web.run_app(app, host='0.0.0.0', port=int(os.getenv("PORT", 8080)))
