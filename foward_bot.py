@@ -1,5 +1,4 @@
 from telethon import TelegramClient, events
-from aiohttp import web
 import logging
 import sqlite3
 import os
@@ -8,12 +7,12 @@ import os
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Telegram API credentials
-api_id = 29052843
-api_hash = "cc4e2a7bff47daf36d18bcf81c63e166"
-phone = "+2347064976568"
-DESTINATION_CHAT_ID = 799248202
-SOURCE_CHAT_ID = -1001098711099
+# Telegram API credentials (use environment variables)
+api_id = int(os.getenv("API_ID"))
+api_hash = os.getenv("API_HASH")
+phone = os.getenv("PHONE")
+DESTINATION_CHAT_ID = int(os.getenv("DESTINATION_CHAT_ID"))
+SOURCE_CHAT_ID = int(os.getenv("SOURCE_CHAT_ID"))
 KEYWORDS = ["ago palace", "ago", "festac", "isolo", "surulere", "amuwo", "mushin"]
 
 # SQLite database
@@ -47,13 +46,6 @@ async def handler(event):
         log_message(event.chat_id, event.message.text, found_keywords, event.message.date)
         logger.info(f"Forwarded message with keywords: {found_keywords}")
 
-# Webhook server for Render
-async def webhook(request):
-    return web.Response(text="Webhook active")
-
-app = web.Application()
-app.router.add_get('/', webhook)
-
 async def main():
     await client.start(phone=phone)
     logger.info("Client started")
@@ -61,7 +53,4 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
-    from aiohttp import web
-    loop = asyncio.get_event_loop()
-    loop.create_task(main())
-    web.run_app(app, host='0.0.0.0', port=int(os.getenv("PORT", 8080)))
+    asyncio.run(main())
