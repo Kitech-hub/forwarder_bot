@@ -5,14 +5,10 @@ import sqlite3
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
-
-# Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Telegram API credentials
 api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 phone = os.getenv("PHONE")
@@ -20,7 +16,6 @@ DESTINATION_CHAT_ID = int(os.getenv("DESTINATION_CHAT_ID"))
 SOURCE_CHAT_ID = int(os.getenv("SOURCE_CHAT_ID"))
 KEYWORDS = ["ago palace", "ago", "festac", "isolo", "surulere", "amuwo", "mushin"]
 
-# SQLite database
 def log_message(chat_id, message_text, keywords, timestamp):
     conn = sqlite3.connect('forwarded_messages.db')
     cursor = conn.cursor()
@@ -31,7 +26,6 @@ def log_message(chat_id, message_text, keywords, timestamp):
     conn.commit()
     conn.close()
 
-# Initialize client
 client = TelegramClient('session_name', api_id, api_hash)
 
 @client.on(events.NewMessage(chats=[SOURCE_CHAT_ID]))
@@ -51,7 +45,6 @@ async def handler(event):
         log_message(event.chat_id, event.message.text, found_keywords, event.message.date)
         logger.info(f"Forwarded message with keywords: {found_keywords}")
 
-# Web server for health check
 async def webhook(request):
     return web.Response(text="Bot is alive")
 
